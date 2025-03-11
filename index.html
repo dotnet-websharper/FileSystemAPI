@@ -1,0 +1,22 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>File and Directory Entries API</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" type="text/css" href="Content/WebSharper.FileSystem.Sample.css" />
+    <style>
+        /* Don't show the not-yet-loaded templates */
+        [ws-template], [ws-children-template] { display: none; }
+    </style>
+    <script type="module" src="Content/WebSharper.FileSystem.Sample.head.js"></script>
+</head>
+<body>
+    <h1>File and Directory Entries API</h1>
+    <div id="main" ws-children-template="Main">
+        <button ws-onclick="OpenDirectory">Select Folder</button>
+        <ul id="fileList" ws-hole="FileList"></ul>
+    </div>
+    <script type="module" src="Content/WebSharper.FileSystem.Sample.min.js"></script>
+</body>
+</html>
