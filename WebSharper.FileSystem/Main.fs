@@ -212,18 +212,9 @@ module Definition =
             ]
         }
 
-    let Window =
-        Class "Window"
-        |+> Instance [
-            "showDirectoryPicker" => !?ShowDirectoryPickerOptions?options ^-> T<Promise<_>>[FileSystemDirectoryHandle]
-            "showOpenFilePicker" => !?FilePickerOptions?options ^-> T<Promise<_>>[!|FileSystemFileHandle]
-            "showSaveFilePicker" => !?SaveFilePickerOptions?options ^-> T<Promise<_>>[FileSystemFileHandle]
-        ]
-
     let Assembly =
         Assembly [
             Namespace "WebSharper.FileSystem" [
-                Window
                 SaveFilePickerOptions
                 FilePickerOptions
                 FilePickerAcceptType

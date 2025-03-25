@@ -76,8 +76,7 @@ module Client =
         promise {
             try
                 // Open directory picker
-                let window = As<Window>(JS.Window)
-                let! handle = window.ShowDirectoryPicker()
+                let! handle = JS.Window.ShowDirectoryPicker()
                 let fileList = JS.Document.GetElementById("fileList")
                 fileList.InnerHTML <- ""
 

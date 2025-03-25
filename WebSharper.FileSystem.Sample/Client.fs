@@ -12,13 +12,12 @@ module Client =
     // The templates are loaded from the DOM, so you just can edit index.html
     // and refresh your browser, no need to recompile unless you add or remove holes.
     type IndexTemplate = Template<"wwwroot/index.html", ClientLoad.FromDocument>
-
+    
     let openDirectory () =
         promise {
             try
                 // Open directory picker
-                let window = As<Window>(JS.Window)
-                let! handle = window.ShowDirectoryPicker()
+                let! handle = JS.Window.ShowDirectoryPicker()
                 let fileList = JS.Document.GetElementById("fileList")
                 fileList.InnerHTML <- ""
 

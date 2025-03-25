@@ -1,11 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.13.35825.156 d17.13
+VisualStudioVersion = 17.13.35825.156
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "WebSharper.FileSystem", "WebSharper.FileSystem\WebSharper.FileSystem.fsproj", "{7030D015-B1ED-405F-B407-EA8B0BC47B8F}"
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "WebSharper.FileSystem.Sample", "WebSharper.FileSystem.Sample\WebSharper.FileSystem.Sample.fsproj", "{E5FCD37B-AE20-402E-B84A-A4448854B62F}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "WebSharper.FileSystem.Extensions", "WebSharper.FileSystem.Extensions\WebSharper.FileSystem.Extensions.fsproj", "{95B1E91F-518F-41F5-9792-249CAE28291D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{E5FCD37B-AE20-402E-B84A-A4448854B62F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E5FCD37B-AE20-402E-B84A-A4448854B62F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E5FCD37B-AE20-402E-B84A-A4448854B62F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{95B1E91F-518F-41F5-9792-249CAE28291D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{95B1E91F-518F-41F5-9792-249CAE28291D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{95B1E91F-518F-41F5-9792-249CAE28291D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{95B1E91F-518F-41F5-9792-249CAE28291D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
