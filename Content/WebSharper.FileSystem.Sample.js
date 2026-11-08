@@ -25,26 +25,26 @@ function directoryName(){
 function openDirectory(){
   return new Promise((_1) => {
     _1(new Promise((_2) => {
-      _2((status().Set("Opening the directory picker..."),globalThis.showDirectoryPicker().then((d) => {
-        directoryName().Set(d.name);
+      _2((status().Set("Opening the directory picker..."),globalThis.showDirectoryPicker().then((a) => {
+        directoryName().Set(a.name);
         entries().Set(FSharpList.Empty);
         status().Set("Reading the directory contents...");
-        const iterator=d.values();
+        const iterator=a.values();
         const items=MarkResizable([]);
         function loop(){
           return new Promise((_3) => {
-            _3(OfAsync(AsAsync(iterator.next())).then((d_1) =>!(d_1==null)?!d_1.done?(items.push(describeEntry(d_1.value)),loop()):Promise.resolve(null):Promise.resolve(null)));
+            _3(OfAsync(AsAsync(iterator.next())).then((a_1) =>!(a_1==null)?!a_1.done?(items.push(describeEntry(a_1.value)),loop()):Promise.resolve(null):Promise.resolve(null)));
           });
         }
         return loop().then(() => {
           entries().Set(ofSeq(items));
-          status().Set("Found "+String(length(items))+" entries in "+String(d.name)+".");
+          status().Set(["Found ", String(length(items)), " entries in ", a.name, "."].join(""));
           return Promise.resolve(null);
         });
       })));
-    })["catch"]((d) => {
-      const a=unwrapExn(d);
-      status().Set("Error: "+a.message);
+    })["catch"]((a) => {
+      const a_1=unwrapExn(a);
+      status().Set("Error: "+a_1.message);
       return Promise.resolve(null);
     }));
   });
@@ -682,7 +682,7 @@ class Attr {
   }
   static HandlerImpl(event, q){
     return Attr.A3((el) => {
-      el.addEventListener(event, (d) =>(q(el))(d), false);
+      el.addEventListener(event, (o) =>(q(el))(o), false);
     });
   }
   static Create(name, value){
@@ -3687,7 +3687,7 @@ class Event extends TemplateHole {
 }
 function Handler(name, callback){
   return Attr.A3((el) => {
-    el.addEventListener(name, (d) =>(callback(el))(d), false);
+    el.addEventListener(name, (o) =>(callback(el))(o), false);
   });
 }
 function OnAfterRender(callback){
