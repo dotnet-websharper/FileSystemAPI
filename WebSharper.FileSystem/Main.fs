@@ -28,10 +28,10 @@ module Definition =
             Required = []
             Optional = [
                 "changedHandle", T<obj> // Can be FileSystemFileHandle, FileSystemDirectoryHandle, or FileSystemSyncAccessHandle
-                "relativePathComponents", !|T<obj> // Array of path components leading to changedHandle
-                "relativePathMovedFrom", !|T<obj> // Path components of the previous location (for "moved" type)
+                "relativePathComponents", !|T<string> // Array of path components leading to changedHandle
+                "relativePathMovedFrom", !|T<string> // Path components of the previous location (for "moved" type)
                 "root", T<obj> // The root file system handle
-                "type", T<string> // Type of change observed ("appeared", "disappeared", "errored", etc.)
+                "type", Enum.FileSystemChangeRecordType.Type // Type of change observed ("appeared", "disappeared", "errored", etc.)
             ]
         }
 
@@ -150,8 +150,12 @@ module Definition =
         ]
 
     let FileSystemObserverOptions =
-        Class "FileSystemObserverOptions"
-        |=> Inherits FileSystemHandleRemoveOptions
+        Pattern.Config "FileSystemObserverOptions" {
+            Required = []
+            Optional = [
+                "recursive", T<bool>
+            ]
+        }
 
     let FileSystemObserver =
 
@@ -163,7 +167,7 @@ module Definition =
         ]
         |+> Instance [
             "disconnect" => T<unit> ^-> T<unit>
-            "sconnect" => T<obj>?handle * !?FileSystemObserverOptions?options ^-> T<unit>
+            "observe" => FileSystemHandle?handle * !?FileSystemObserverOptions?options ^-> T<unit>
         ]
 
     let StorageManager = 

@@ -1,127 +1,156 @@
-# WebSharper FileSystem API Binding
+# WebSharper.FileSystem
 
-This repository provides an F# [WebSharper](https://websharper.com/) binding for the [File System API](https://developer.mozilla.org/en-US/docs/Web/API/File_System_API), enabling WebSharper applications to interact with the file system, open directories, and read file metadata.
+[![NuGet](https://img.shields.io/badge/nuget-not%20published-lightgrey)](https://github.com/dotnet-websharper/FileSystemAPI)
 
-## Repository Structure
+WebSharper bindings for the [File System API](https://developer.mozilla.org/en-US/docs/Web/API/File_System_API) —
+opening directories and files, reading their contents, and writing changes back from F# and C# web apps.
 
-The repository consists of two main projects:
+The File System API is only available in [secure contexts](https://developer.mozilla.org/en-US/docs/Web/Security/Defenses/Secure_Contexts)
+(HTTPS or localhost), and the browser asks the user to pick a directory before the page can read it.
 
-1. **Binding Project**:
+This repository contains:
 
-   - Contains the F# WebSharper binding for the File System API.
+| Project | Purpose |
+| --- | --- |
+| `WebSharper.FileSystem` | The binding: WIG definitions for `FileSystemHandle`, `FileSystemFileHandle`, `FileSystemDirectoryHandle`, `FileSystemWritableFileStream`, `FileSystemSyncAccessHandle`, `FileSystemObserver`, and their option dictionaries. |
+| `WebSharper.FileSystem.Extensions` | `[<Inline>]` client extensions: `window.showDirectoryPicker()`, `showOpenFilePicker()`, and `showSaveFilePicker()`. |
+| `WebSharper.FileSystem.Sample` | An ASP.NET Core SPA that opens a directory and lists its entries. |
 
-2. **Sample Project**:
-   - Demonstrates how to use the File System API with WebSharper syntax.
-   - Includes a GitHub Pages demo: [View Demo](https://dotnet-websharper.github.io/FileSystemAPI/)
+## Live demos
+
+**Try it live:** [Open the sample in your browser](https://dotnet-websharper.github.io/FileSystemAPI/)
+
+![File System API sample](docs/sample.png)
+
+The sample doubles as the binding's test case: it exercises the directory picker and the async directory iterator in a real browser.
+
+- **Sample (this repository):** <https://dotnet-websharper.github.io/FileSystemAPI/>
+- **Source repository:** <https://github.com/dotnet-websharper/FileSystemAPI>
+- **WebSharper bindings:** <https://websharper.com/bindings>
+
+## Features
+
+- `FileSystemHandle` (`kind`, `name`, `isSameEntry`, `queryPermission`, `requestPermission`, `remove`).
+- `FileSystemFileHandle` (`getFile`, `createWritable`, `createSyncAccessHandle`).
+- `FileSystemDirectoryHandle` (`getDirectoryHandle`, `getFileHandle`, `removeEntry`, `resolve`, and the async `entries`/`keys`/`values` iterators).
+- `FileSystemWritableFileStream` (`write`, `seek`, `truncate`) and `FileSystemSyncAccessHandle`.
+- The experimental `FileSystemObserver` and its `FileSystemChangeRecord` callback.
+- `showDirectoryPicker()`, `showOpenFilePicker()`, and `showSaveFilePicker()` in the Extensions assembly.
 
 ## Installation
 
-To use this package in your WebSharper project, add the NuGet package:
+The binding is not currently published to NuGet. Reference the projects from source:
 
 ```bash
-   dotnet add package WebSharper.FileSystem
+git clone https://github.com/dotnet-websharper/FileSystemAPI.git
 ```
 
-## Building
+```xml
+<ItemGroup>
+  <ProjectReference Include="path/to/WebSharper.FileSystem/WebSharper.FileSystem.fsproj" />
+  <ProjectReference Include="path/to/WebSharper.FileSystem.Extensions/WebSharper.FileSystem.Extensions.fsproj" />
+</ItemGroup>
+```
 
-### Prerequisites
-
-- [.NET SDK](https://dotnet.microsoft.com/download) installed on your machine.
-
-### Steps
-
-1. Clone the repository:
-
-   ```bash
-   git clone https://github.com/dotnet-websharper/FileSystem.git
-   cd FileSystem
-   ```
-
-2. Build the Binding Project:
-
-   ```bash
-   dotnet build WebSharper.FileSystem/WebSharper.FileSystem.fsproj
-   ```
-
-3. Build and Run the Sample Project:
-
-   ```bash
-   cd WebSharper.FileSystem.Sample
-   dotnet build
-   dotnet run
-   ```
-
-## Example Usage
-
-Below is an example of how to use the File System API in a WebSharper project:
+## Usage
 
 ```fsharp
-namespace WebSharper.FileSystem.Sample
+namespace WebSharper.FileSystem.Demo
 
 open WebSharper
 open WebSharper.JavaScript
-open WebSharper.UI
-open WebSharper.UI.Client
-open WebSharper.UI.Templating
 open WebSharper.FileSystem
 
 [<JavaScript>]
-module Client =
-    // The templates are loaded from the DOM, so you just can edit index.html
-    // and refresh your browser, no need to recompile unless you add or remove holes.
-    type IndexTemplate = Template<"wwwroot/index.html", ClientLoad.FromDocument>
-
-    // Function to open a directory picker and read file names
+module Demo =
     let openDirectory () =
         promise {
-            try
-                // Open directory picker
-                let! handle = JS.Window.ShowDirectoryPicker()
-                let fileList = JS.Document.GetElementById("fileList")
-                fileList.InnerHTML <- ""
+            let! handle = JS.Window.ShowDirectoryPicker()
 
-                let iterator = handle.Values()
-
-                // Function to iterate over directory contents
-                let rec loop () =
-                    promise {
-                        let! result = iterator?next() |> Promise.AsAsync
-                        if not (isNull result) then
-                            let isDone = result?``done`` |> As<bool>
-                            if not isDone then
-                                let entry = result?value |> As<FileSystemFileHandle>
-                                let name = entry.Name
-                                let kind = entry.Kind
-                                let icon = if kind = "directory" then " 📁" else " 📄"
-
-                                // Create a list item for each file or directory
-                                let listItem = JS.Document.CreateElement("li")
-                                listItem.TextContent <- $"{name}{icon}"
-                                fileList.AppendChild(listItem) |> ignore
-
-                                return! loop ()
-                    }
-                do! loop ()
-            with ex ->
-                Console.Error($"Error accessing directory: {ex.Message}")
-        }
-
-    [<SPAEntryPoint>]
-    let Main () =
-
-        IndexTemplate.Main()
-            .OpenDirectory(fun _ ->
-                async {
-                    do! openDirectory () |> Promise.AsAsync
+            let iterator = handle.Values()
+            let rec loop () =
+                promise {
+                    let! result = iterator?next() |> Promise.AsAsync
+                    if not (isNull result) then
+                        let isDone = result?``done`` |> As<bool>
+                        if not isDone then
+                            let entry = result?value |> As<FileSystemHandle>
+                            Console.Log($"{entry.Kind}: {entry.Name}")
+                            return! loop ()
                 }
-                |> Async.StartImmediate
-            )
-            .Doc()
-        |> Doc.RunById "main"
+            do! loop ()
+        }
 ```
 
-## Important Considerations
+The `showDirectoryPicker()` / `showOpenFilePicker()` / `showSaveFilePicker()` extensions are declared in the
+Extensions assembly and hang off `JS.Window`. `FileSystemDirectoryHandle.values()` returns an async iterator;
+pull entries with `next()` and check the `done` flag.
 
-- **Browser Compatibility**: The File System API is currently supported only in modern browsers with appropriate permissions.
-- **Security Restrictions**: Access to files and directories is subject to user permissions and browser security policies.
-- **Read-Only Mode**: Some browsers may only allow read operations without modification access.
+## Running the sample
+
+Build the sample in Release and serve its static output:
+
+```bash
+dotnet build WebSharper.FileSystem.Sample/WebSharper.FileSystem.Sample.fsproj -c Release
+python3 -m http.server -d WebSharper.FileSystem.Sample/wwwroot 8099
+```
+
+Open <http://localhost:8099/>. Localhost counts as a secure context, so the File System API is available.
+
+Alternatively, run the ASP.NET Core host:
+
+```bash
+dotnet run --project WebSharper.FileSystem.Sample
+```
+
+## Building from source
+
+### Prerequisites
+
+- [.NET SDK 10](https://dotnet.microsoft.com/download) or later.
+
+### Build
+
+```bash
+dotnet build WebSharper.FileSystem.sln -c Release
+```
+
+The binding projects target `netstandard2.0`; the sample targets `net10.0`.
+
+## Deployment
+
+Pushing to `main` triggers `.github/workflows/ghpages.yml`, which builds the sample in Release and publishes
+`WebSharper.FileSystem.Sample/wwwroot` to the `gh-pages` branch.
+
+## Repository layout
+
+```
+WebSharper.FileSystem/              # binding (WIG definitions)
+  Main.fs
+WebSharper.FileSystem.Extensions/   # [<Inline>] client extensions
+  Library.fs
+WebSharper.FileSystem.Sample/       # ASP.NET Core SPA demo
+  Client.fs
+  Startup.fs
+  wwwroot/
+    index.html
+    site.css
+.github/workflows/ghpages.yml      # build + deploy the sample to GitHub Pages
+```
+
+## Notes on the API
+
+- **Secure context:** the File System API is only exposed in secure contexts. Serve the page over HTTPS or from
+  localhost.
+- **User gesture:** `showDirectoryPicker()` and the file pickers must be called from a user gesture (for example,
+  a button click).
+- **Permissions:** the browser asks for read/write access. `queryPermission()` and `requestPermission()` let the
+  page check and request the `read` or `readwrite` mode.
+- **Async iterators:** `FileSystemDirectoryHandle.entries()`, `keys()`, and `values()` return async iterators. The
+  binding types them as `obj`; call `next()` and read `value` / `done`.
+- **Experimental:** `FileSystemObserver`, `FileSystemSyncAccessHandle`, and `FileSystemHandle.remove()` are not
+  Baseline and may be missing in some browsers.
+
+## License
+
+Apache 2.0 — see [LICENSE.md](LICENSE.md).
