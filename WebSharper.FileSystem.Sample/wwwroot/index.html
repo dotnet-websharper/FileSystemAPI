@@ -1,22 +1,37 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>File and Directory Entries API</title>
+    <title>WebSharper File System API Demo</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' rx='3' fill='%234f46e5'/%3E%3Cpath d='M3 5.5h3.2l1.2 1.5H13v5.5H3z' fill='white'/%3E%3C/svg%3E" />
     <link rel="stylesheet" type="text/css" href="Content/WebSharper.FileSystem.Sample.css" />
-    <style>
-        /* Don't show the not-yet-loaded templates */
-        [ws-template], [ws-children-template] { display: none; }
-    </style>
+    <link rel="stylesheet" type="text/css" href="site.css" />
     <script type="module" src="Content/WebSharper.FileSystem.Sample.head.js"></script>
 </head>
 <body>
-    <h1>File and Directory Entries API</h1>
-    <div id="main" ws-children-template="Main">
-        <button ws-onclick="OpenDirectory">Select Folder</button>
-        <ul id="fileList" ws-hole="FileList"></ul>
-    </div>
+    <main class="page">
+        <header class="hero">
+            <h1>File System API Demo</h1>
+            <p class="lede">
+                Open a directory and list its entries with the
+                <a href="https://developer.mozilla.org/en-US/docs/Web/API/File_System_API" target="_blank" rel="noreferrer">File System API</a>.
+                The page must run in a secure context (HTTPS or localhost).
+            </p>
+        </header>
+
+        <section class="card">
+            <h2>Directory picker</h2>
+            <p class="hint">Uses <code>window.showDirectoryPicker()</code> and an async directory iterator.</p>
+            <div class="actions">
+                <button class="btn btn-primary" ws-onclick="openDirectory">Select folder</button>
+            </div>
+            <p class="directory">${directoryName}</p>
+            <ul class="entries" ws-hole="entries"></ul>
+        </section>
+
+        <p class="status" role="status">${status}</p>
+    </main>
     <script type="module" src="Content/WebSharper.FileSystem.Sample.min.js"></script>
 </body>
 </html>
